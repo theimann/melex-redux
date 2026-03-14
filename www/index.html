@@ -1959,10 +1959,10 @@ class GameScene extends Phaser.Scene {
         const cam = this.cameras.main;
         // Rotate camera −90° so the portrait world (LW×LH) fills
         // the landscape canvas (SCREEN_W×SCREEN_H).
-        //   Screen LEFT   = World SOUTH  (WY high)
-        //   Screen RIGHT  = World NORTH  (WY low)
-        //   Screen TOP    = World EAST   (WX high)
-        //   Screen BOTTOM = World WEST   (WX low)
+        //   Screen LEFT   = World WEST   (WY low)  — runway 06 threshold, hangars
+        //   Screen RIGHT  = World EAST   (WY high) — winch end
+        //   Screen TOP    = World NORTH  (WX high) — river
+        //   Screen BOTTOM = World SOUTH  (WX low)  — start hut
         cam.setRotation(-Math.PI / 2);
         // Zoom out so the full world (LW×LH = 1350×2400) fits in the canvas.
         // zoom = SCREEN_H / LW = 900/1350 = 2/3  (also = SCREEN_W / LH = 1600/2400 ✓)
