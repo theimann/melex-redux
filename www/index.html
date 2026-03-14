@@ -2085,7 +2085,7 @@ class GameScene extends Phaser.Scene {
 
         // Winch station — shifted west so slot 0 aligns with launch box left edge
         {
-            const wcx = WINCH_CX, wcy = 150;  // north end of airfield, screen right
+            const wcx = WINCH_CX, wcy = LH - 200;  // east end of airfield (screen right, ~1467px), extended grass zone
             this._winchPos = { x: wcx, y: wcy };
             drawWinch(ctx, wcx, wcy);
         }
@@ -10119,9 +10119,9 @@ class GameScene extends Phaser.Scene {
                     gl._rbX += Math.cos(gl._rbHeading) * gl._rbSpeed * dt;
                     gl._rbY += Math.sin(gl._rbHeading) * gl._rbSpeed * dt;
 
-                    // Hard northern limit — don't roll past winch (winch is now at north end)
+                    // Hard eastern limit — don't roll past winch
                     const _rbSouthLimit = this._winchPos ? this._winchPos.y - 50 : LAUNCH_Y + 200;
-                    if (gl._rbY < _rbSouthLimit) {
+                    if (gl._rbY > _rbSouthLimit) {
                         gl._rbY = _rbSouthLimit;
                         gl._rbSpeed = 0; // force immediate stop
                     }
@@ -10243,9 +10243,9 @@ class GameScene extends Phaser.Scene {
                     }
                     gl.sprite.x += Math.sin(gl._lrbRollHeading) * gl._lrbSpeed * dt;
                     gl.sprite.y += Math.cos(gl._lrbRollHeading) * gl._lrbSpeed * dt;
-                    // Hard northern limit — don't roll past winch (winch is now at north end)
+                    // Hard eastern limit — don't roll past winch
                     const _lrbSouthLimit = this._winchPos ? this._winchPos.y - 50 : LAUNCH_Y + 200;
-                    if (gl.sprite.y < _lrbSouthLimit) {
+                    if (gl.sprite.y > _lrbSouthLimit) {
                         gl.sprite.y = _lrbSouthLimit;
                         gl._lrbSpeed = 0;
                     }
@@ -10353,7 +10353,7 @@ class GameScene extends Phaser.Scene {
         }
         const slotX = this.getCableSlotX(slot); // track which slot, but car is centered on winch
         const carX = this._winchPos ? this._winchPos.x + 37.5 : LAUNCH_CX; // shifted east so slot 0 aligns with box center
-        const winchStartY = this._winchPos ? this._winchPos.y + 40 : GAME_LH + 40; // start south of winch, drive south to launch
+        const winchStartY = this._winchPos ? this._winchPos.y - 40 : GAME_LH + 40; // start north of winch, drive north to launch
         const sprite = this.add.sprite(carX, winchStartY, 'melex_cable').setDepth(5).setTint(0xffffff); // winch melex: white
         sprite.setRotation(0); // facing north (up) — sprite drawn facing up
         const shadow = this.add.sprite(carX + this._shadowOffX, winchStartY + this._shadowOffY, 'melex_cable').setDepth(4).setTint(0x000000).setAlpha(0.2);
@@ -10412,9 +10412,9 @@ class GameScene extends Phaser.Scene {
 
         switch (cc.phase) {
             case 'driving_up':
-                cc.sprite.y += cc.speed * dt; // winch at north — drive south toward launch area
+                cc.sprite.y -= cc.speed * dt; // drive northward (screen-left) toward launch area
                 // Draw spreader bar centered on car, cables from bar to fixed snout positions
-                { const winchY = this._winchPos ? this._winchPos.y + 33 : GAME_LH + 100; // snout exit (south face of winch)
+                { const winchY = this._winchPos ? this._winchPos.y - 33 : GAME_LH + 100; // snout exit (north face of winch)
                   const barY = cc.sprite.y; // center of cable car
                   const halfSpan = (100 * S) / 2 - (100 * S) / 8; // half the slot span = 37.5
                   const barL = cc.sprite.x - halfSpan;
@@ -10443,7 +10443,7 @@ class GameScene extends Phaser.Scene {
                       this.ropeGraphics.fillRect(_barX - 2, barY - 3, 4, 6);
                   }
                 }
-                if (cc.sprite.y >= cc.targetY) {
+                if (cc.sprite.y <= cc.targetY) {
                     cc.sprite.y = cc.targetY;
                     cc.phase = 'waiting';
                     cc.waitTimer = 0.2; // pause briefly
@@ -10515,7 +10515,7 @@ class GameScene extends Phaser.Scene {
                     const nextX = this.getCableSlotX(nextSlot);
                     cc._cableSlot = nextSlot;
                     cc.sprite.x = this._winchPos ? this._winchPos.x + 37.5 : LAUNCH_CX; // shifted east so slot 0 at box center
-                    cc.sprite.y = this._winchPos ? this._winchPos.y + 40 : GAME_LH + 40; // start south of winch
+                    cc.sprite.y = this._winchPos ? this._winchPos.y - 40 : GAME_LH + 40; // start north of winch
                     if (cc.shadow) { cc.shadow.x = cc.sprite.x + this._shadowOffX; cc.shadow.y = cc.sprite.y + this._shadowOffY; }
                     cc.phase = 'driving_up';
                 }
