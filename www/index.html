@@ -10606,6 +10606,9 @@ class GameScene extends Phaser.Scene {
         const _grassFxOn = window._customSettings && window._customSettings.grassFx !== 'off' && window._customSettings.grassFx != null;
         // Skip during FF — too many sprite updates tank frame rate
         if (this._timeWarp) return;
+        // Throttle: sway is subtle enough to update every 2nd frame (saves ~50% grass CPU)
+        this._grassSwayFrame = ((this._grassSwayFrame || 0) + 1) % 2;
+        if (this._grassSwayFrame !== 0) return;
         const t = time / 1000;
         const ws = this._windSpeed || 0;
         const raining = this._weatherState === 'rain' || this._weatherState === 'storm';
@@ -12122,8 +12125,15 @@ class GameScene extends Phaser.Scene {
 const config = {
     type: Phaser.AUTO,
     width: SCREEN_W,   // 1600 — landscape canvas
-    height: SCREEN_H,  //  800
+    height: SCREEN_H,  //  900
     backgroundColor: '#3a7528',
+    // Cap at 1:1 — prevents 2× internal canvas on HiDPI/Steam Deck (halves fill-rate cost)
+    resolution: 1,
+    render: {
+        powerPreference: 'high-performance',
+        antialias: false,   // off: measurably faster, negligible visual diff at game scale
+        pixelArt: false,
+    },
     physics: {
         default: 'arcade',
         arcade: { debug: false }
@@ -12133,8 +12143,6 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    pixelArt: false,
-    antialias: true,
     input: {
         activePointers: 3
     }
